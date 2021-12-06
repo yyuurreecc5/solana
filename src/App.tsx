@@ -1,26 +1,40 @@
-import React from 'react';
-import logo from './logo.svg';
 import './App.css';
+import React from 'react';
+import { TransactionsTable } from './components/features/TransactionsTable';
+import { getData, TData } from './api/getData';
+import Button from '@mui/material/Button'
+const account = '8YmMhex5Vd5JPsyNhCwFPDx5vqeedpCuyFE2W7VtRXQT';
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+	const [data, setData] = React.useState<TData[]>([]);
+	const [isLoading, setIsLoading] = React.useState<boolean>(false);
+	React.useEffect(() => {
+		getData(account).then(result => {
+			setData(result);
+		});
+	}, []);
+
+	const onClickHandler = React.useCallback(() => {
+		setIsLoading(true);
+		getData(account).then(result => {
+			setData([...data, ...result]);
+			setIsLoading(false);
+		})
+	}, [data]);
+
+	return (
+		<div className="app">
+			<div className="table">
+				<TransactionsTable data={data}/>
+			</div>
+			{
+				data.length ?
+					<div className="button">
+						<Button onClick={onClickHandler} variant="contained">{isLoading ? 'Loading...' : 'Load more'}</Button>
+					</div> : <span className="loading">Loading...</span>
+			}
+		</div>
+	);
 }
 
 export default App;
