@@ -21,16 +21,16 @@ export const getData = async (account: string): Promise<TData[]> => {
 
   return Promise.all(promises).then((results) => {
     return results.map((result, index) => {
-      const preBalance = getFirst(result.meta.preBalances, 0);
-      const postBalance = getLast(result.meta.postBalances, 0);
-
+      const preBalance = getLast(result.meta.preBalances, 0);
+      const postBalance = getFirst(result.meta.postBalances, 0);
+      const changeBalance = postBalance - preBalance;
       return {
         signature: signatures[index],
         date: new Date(result.blockTime * 1000).toLocaleString(),
         status: isSuccess(result.meta.logMessages),
-        postBalance: postBalance / 100000000,
-        preBalance: preBalance / 100000000,
-        balanceChange: (preBalance - postBalance) / 100000000,
+        postBalance: postBalance !== 0 ? postBalance / 1000000000 : 0,
+        preBalance: preBalance !== 0 ? preBalance / 1000000000 : 0,
+        balanceChange: changeBalance !== 0 ? changeBalance / 1000000000 : 0,
       };
     });
   });
