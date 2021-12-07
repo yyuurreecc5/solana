@@ -1,7 +1,7 @@
 import React from 'react';
 import { Column, useTable } from 'react-table';
 
-import CssBaseline from '@mui/material/CssBaseline';
+import '@mui/material/CssBaseline';
 import MaUTable from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
 import TableCell from '@mui/material/TableCell';
