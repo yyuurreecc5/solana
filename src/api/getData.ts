@@ -14,7 +14,6 @@ export type TData = {
 let lastSignature = '';
 let lastAccount = '';
 export const getData = async (account: string): Promise<TData[]> => {
-  console.log({ lastAccount, account });
   if (lastAccount && lastAccount !== account) {
     console.log('if');
     lastSignature = '';
@@ -29,7 +28,7 @@ export const getData = async (account: string): Promise<TData[]> => {
 
   return Promise.all(promises).then((results) => {
     return results.map((result, index) => {
-      const preBalance = getLast(result.meta.preBalances, 0);
+      const preBalance = getFirst(result.meta.preBalances, 0);
       const postBalance = getFirst(result.meta.postBalances, 0);
       const changeBalance = postBalance - preBalance;
       return {
