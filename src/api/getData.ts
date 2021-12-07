@@ -12,9 +12,17 @@ export type TData = {
 };
 
 let lastSignature = '';
+let lastAccount = '';
 export const getData = async (account: string): Promise<TData[]> => {
+  console.log({ lastAccount, account });
+  if (lastAccount && lastAccount !== account) {
+    console.log('if');
+    lastSignature = '';
+  }
+
   const signatures = await getSignatures(account, lastSignature);
   lastSignature = getLast(signatures, '');
+  lastAccount = account;
   const promises = signatures.map((signature) => {
     return getTransactionInfo(signature);
   });
