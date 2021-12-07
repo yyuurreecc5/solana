@@ -1,14 +1,18 @@
+import { Box, CircularProgress } from '@mui/material';
+import Button from '@mui/material/Button';
 import React from 'react';
 import { Column } from 'react-table';
 import { toPlainString } from '../../utils/number';
-import { TData } from '../../api/getData';
+import { getData, TData } from '../../api/getData';
 import { Table } from '../ui-kit/Table';
 
 type TProps = {
-  data: TData[];
+  account: string;
 };
 
-export const TransactionsTable: React.FC<TProps> = ({ data }) => {
+export const TransactionsTable: React.FC<TProps> = ({ account }) => {
+  const [data, setData] = React.useState<TData[]>([]);
+  const [isLoading, setIsLoading] = React.useState<boolean>(false);
   const columns: Column<TData>[] = React.useMemo(
     () => [
       {
@@ -56,5 +60,43 @@ export const TransactionsTable: React.FC<TProps> = ({ data }) => {
     []
   );
 
-  return <Table data={data} columns={columns} />;
+  React.useEffect(() => {
+    setData([]);
+    getData(account).then((result) => {
+      setData(result);
+    });
+  }, [account]);
+
+  const onClickHandler = React.useCallback(() => {
+    setIsLoading(true);
+    getData(account).then((result) => {
+      setData([...data, ...result]);
+      setIsLoading(false);
+    });
+  }, [data, account]);
+
+  return (
+    <div>
+      <div className="table">
+        <Table data={data} columns={columns} />{' '}
+      </div>
+      {data.length ? (
+        <div className="button">
+          {isLoading ? (
+            <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+              <CircularProgress />
+            </Box>
+          ) : (
+            <Button onClick={onClickHandler} variant="contained">
+              Load more
+            </Button>
+          )}
+        </div>
+      ) : (
+        <Box sx={{ display: 'flex', justifyContent: 'center' }}>
+          <CircularProgress />
+        </Box>
+      )}
+    </div>
+  );
 };

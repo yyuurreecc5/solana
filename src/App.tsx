@@ -1,41 +1,35 @@
 import './App.css';
-import React from 'react';
+import React, { SyntheticEvent } from 'react';
+import { FormControl, TextField } from '@mui/material';
 import { TransactionsTable } from './components/features/TransactionsTable';
-import { getData, TData } from './api/getData';
-import Button from '@mui/material/Button';
-const account = '8YmMhex5Vd5JPsyNhCwFPDx5vqeedpCuyFE2W7VtRXQT';
+const DEFAULT_ACCOUNT = '8YmMhex5Vd5JPsyNhCwFPDx5vqeedpCuyFE2W7VtRXQT';
 
 function App() {
-  const [data, setData] = React.useState<TData[]>([]);
-  const [isLoading, setIsLoading] = React.useState<boolean>(false);
-  React.useEffect(() => {
-    getData(account).then((result) => {
-      setData(result);
-    });
-  }, []);
+  const [account, setAccount] = React.useState<string>(DEFAULT_ACCOUNT);
 
-  const onClickHandler = React.useCallback(() => {
-    setIsLoading(true);
-    getData(account).then((result) => {
-      setData([...data, ...result]);
-      setIsLoading(false);
-    });
-  }, [data]);
+  const onSearchHandler = React.useCallback((e: SyntheticEvent) => {
+    e.preventDefault();
+    setAccount((e.target as HTMLFormElement).accountSearch.value);
+  }, []);
 
   return (
     <div className="app">
-      <div className="table">
-        <TransactionsTable data={data} />
+      <div className="search">
+        <form onSubmit={onSearchHandler}>
+          <FormControl fullWidth={true}>
+            <TextField
+              fullWidth
+              id="outlined-search"
+              label="Input account public key"
+              type="search"
+              margin="dense"
+              defaultValue={account}
+              name="accountSearch"
+            />
+          </FormControl>
+        </form>
       </div>
-      {data.length ? (
-        <div className="button">
-          <Button onClick={onClickHandler} variant="contained">
-            {isLoading ? 'Loading...' : 'Load more'}
-          </Button>
-        </div>
-      ) : (
-        <span className="loading">Loading...</span>
-      )}
+      {account ? <TransactionsTable account={account} /> : null}
     </div>
   );
 }
